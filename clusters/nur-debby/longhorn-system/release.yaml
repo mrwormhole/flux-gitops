@@ -7,7 +7,7 @@ spec:
   interval: 24h
   chart:
     spec:
-      chart: longhorn/longhorn
+      chart: longhorn
       version: "1.4.x"
       sourceRef:
         kind: HelmRepository
