@@ -186,3 +186,24 @@ spec:
     thanosRuler:
       enabled: false
 ---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: monitoring
+spec:
+  interval: 24h
+  chart:
+    spec:
+      chart: promtail
+      version: "6.11.x"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      interval: 1h
+  values:
+    config:
+    serverPort: 8080
+    clients:
+      - url: http://loki-loki-distributed-gateway/loki/api/v1/push
