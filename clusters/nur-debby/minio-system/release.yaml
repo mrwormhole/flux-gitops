@@ -22,10 +22,11 @@ spec:
     pools: 1
 
     users:
-      - accessKey: OsynT1d6hYh0uqZN
-        existingSecret: minio-credentials
-        existingSecretKey: secretKey
-        policy: consoleAdmin
+      - accessKey: plainaccesskey
+        secretKey: plainsecretkey # TODO: update this once grafana enterprise boys start supporting secrets in their charts
+        #existingSecret: minio-credentials
+        #existingSecretKey: secretKey
+        policy: writeonly
 
     persistence:
       enabled: true
