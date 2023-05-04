@@ -4,7 +4,7 @@ metadata:
   name: kube-prometheus-stack
   namespace: monitoring
 spec:
-  interval: 24h
+  interval: 4h
   chart:
     spec:
       chart: kube-prometheus-stack
@@ -80,7 +80,7 @@ spec:
       additionalDataSources:
         - name: Loki
           type: loki
-          url: http://loki-loki-distributed-query-frontend.monitoring:3100
+          url: http://loki-distributed-query-frontend.monitoring:3100
           
     kubeApiServer:
       enabled: true
@@ -192,7 +192,7 @@ metadata:
   name: promtail
   namespace: monitoring
 spec:
-  interval: 24h
+  interval: 4h
   chart:
     spec:
       chart: promtail
@@ -206,7 +206,7 @@ spec:
     config:
       serverPort: 8080
       clients:
-        - url: http://loki-loki-distributed-gateway/loki/api/v1/push
+        - url: http://loki-distributed-gateway/loki/api/v1/push
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -214,7 +214,7 @@ metadata:
   name: loki-distributed
   namespace: monitoring
 spec:
-  interval: 5m
+  interval: 4h
   chart:
     spec:
       chart: loki-distributed
@@ -223,7 +223,7 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
-      interval: 1m
+      interval: 1h
   values:
     loki:
       compactor:
@@ -231,10 +231,10 @@ spec:
       
       schemaConfig:
         configs:
-        - from: 2020-09-07
+        - from: "2022-01-11"
           store: boltdb-shipper
           object_store: s3
-          schema: v11
+          schema: v12
           index:
             prefix: loki_index_
             period: 24h
@@ -250,8 +250,9 @@ spec:
         aws:
           # Grafana Helm Charts have a brain damage so doesn't support secretKeyRef
           # TODO use a k8s secret when grafana helm charts support secretKeyRef
-          s3: s3://plainaccesskey:plainsecretkey@minio.minio-system.svc.cluster.local:9000/loki
+          s3: s3://plainaccesskey:plainsecretkey@minio.minio-system.svc.cluster.local:9000/logs
           s3forcepathstyle: true
+
           #  access_key_id: xxxxxxxxxxxxxxxxxx
           #  bucketnames: xxxxxxxxxxx
           #  endpoint: xxxxxxxxxxx

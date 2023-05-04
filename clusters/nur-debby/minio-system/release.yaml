@@ -4,7 +4,7 @@ metadata:
   name: minio
   namespace: minio-system
 spec:
-  interval: 24h
+  interval: 4h
   chart:
     spec:
       chart: minio
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: minio
         namespace: flux-system
-      interval: 5m
+      interval: 1h
   values:
     ignoreChartChecksums: true # if you don't have flux, set this to false
     existingSecret: "minio-credentials"
@@ -26,13 +26,13 @@ spec:
         secretKey: plainsecretkey # TODO: update this once grafana enterprise boys start supporting secrets in their charts
         #existingSecret: minio-credentials
         #existingSecretKey: secretKey
-        policy: writeonly
+        policy: consoleAdmin
 
     persistence:
       enabled: true
       storageClass: "longhorn"
       accessMode: ReadWriteOnce
-      size: 10Gi
+      size: 5Gi
 
     resources:
       requests:
