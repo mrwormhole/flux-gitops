@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+  namespace: minio-system
+spec:
+  interval: 4h
+  chart:
+    spec:
+      chart: minio
+      version: "5.0.x"
+      sourceRef:
+        kind: HelmRepository
+        name: minio
+        namespace: flux-system
+      interval: 1h
+  values:
+    ignoreChartChecksums: true # if you don't have flux, set this to false
+    existingSecret: "minio-credentials"
+    drivesPerNode: 1
+    replicas: 3
+    pools: 1
+
+    users:
+      - accessKey: plainaccesskey
+        secretKey: plainsecretkey # TODO: update this once grafana enterprise boys start supporting secrets in their charts
+        #existingSecret: minio-credentials
+        #existingSecretKey: secretKey
+        policy: consoleAdmin
+
+    persistence:
+      enabled: true
+      storageClass: "longhorn"
+      accessMode: ReadWriteOnce
+      size: 5Gi
+
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 250m
+      limits:
+        memory: 500Mi
+        cpu: 250m
+
+    buckets:
+      - name: logs
+        policy: none

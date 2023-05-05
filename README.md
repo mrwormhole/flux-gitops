@@ -11,6 +11,7 @@ export GITHUB_TOKEN=<your-token>
 flux bootstrap github \
   --owner=my-github-username \
   --repository=my-repository \
+  --branch=main \
   --path=clusters/my-cluster \
   --personal
 ```
