@@ -61,7 +61,7 @@ spec:
       messageTemplate: '{{range .Updated.Images}}{{println .}}{{end}}'
     push:
       branch: master
-  interval: 5m
+  interval: 10m
   sourceRef:
     kind: GitRepository
     name: lamia
