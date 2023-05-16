@@ -22,3 +22,49 @@ spec:
   sourceRef:
     kind: GitRepository
     name: lamia
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: lamia
+  namespace: flux-system
+spec:
+  image: ghcr.io/mrwormhole/lamia
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: lamia
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: ghcr.io/mrwormhole/lamia
+  policy:
+    semver:
+      range: 0.x.x
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: lamia
+  namespace: flux-system
+spec:
+  git:
+    checkout:
+      ref:
+        branch: master
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: '{{range .Updated.Images}}{{println .}}{{end}}'
+    push:
+      branch: master
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: lamia
+  update:
+    path: "./manifests"
+    strategy: Setters
