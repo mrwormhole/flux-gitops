@@ -39,7 +39,7 @@ metadata:
   namespace: flux-system
 spec:
   imageRepositoryRef:
-    name: ghcr.io/mrwormhole/lamia
+    name: lamia
   policy:
     semver:
       range: 0.x.x
