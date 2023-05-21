@@ -4,7 +4,7 @@ metadata:
   name: system-info
   namespace: flux-system
 spec:
-  summary: "nur-debby cluster"
+  summary: "nur-debby cluster info"
   providerRef:
     name: discord
   eventSeverity: info
