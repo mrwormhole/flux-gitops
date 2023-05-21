@@ -9,6 +9,7 @@ This repository bootstrapped via flux(`2.0.0-rc.1`) as follows;
 export GITHUB_TOKEN=<your-token>
 
 flux bootstrap github \
+  --components-extra=image-reflector-controller,image-automation-controller \
   --owner=my-github-username \
   --repository=my-repository \
   --branch=main \
@@ -24,13 +25,12 @@ The folder structure as follows(notice there are no dev/staging/prod because clu
 - /clusters
 -- /cluster-name
 --- /namespace
----- /app-name
 ```
 
 Available clusters;
 
 ```
-- nur-debby
+- falk-debby
 ```
 
 **Note: If I had a billion dollar worth, I would pour every penny into flux, It has saved so much pain from my end.**
