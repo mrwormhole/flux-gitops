@@ -97,7 +97,7 @@ spec:
     kubeControllerManager:
       enabled: true
       endpoints: # k3s server IP addresses(not agents)
-        - 78.46.149.38
+        - 157.90.157.99
 
     coreDns:
       enabled: true
@@ -111,12 +111,12 @@ spec:
     kubeScheduler:
       enabled: true
       endpoints: # k3s server IP addresses(not agents)
-        - 78.46.149.38
+        - 157.90.157.99
 
     kubeProxy:
       enabled: true
       endpoints: # k3s server IP addresses(not agents)
-        - 78.46.149.38
+        - 157.90.157.99
 
     kubeStateMetrics:
       enabled: true
