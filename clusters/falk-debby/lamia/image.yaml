@@ -36,6 +36,9 @@ spec:
       messageTemplate: '{{range .Updated.Images}}{{println .}}{{end}}'
     push:
       branch: master
+  sourceRef:
+    kind: GitRepository
+    name: flux-system    
   interval: 10m
   update:
     path: "./clusters/falk-debby/lamia"
