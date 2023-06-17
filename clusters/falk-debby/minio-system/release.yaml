@@ -15,12 +15,19 @@ spec:
         namespace: flux-system
       interval: 1h
   values:
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2022-09-17T00-09-45Z # After helm chart version 4.0.0 Minio started having issues with port-forward due to websockets, this is for using older image on purpose.
+      pullPolicy: IfNotPresent
+    
     ignoreChartChecksums: true # if you don't have flux, set this to false
     existingSecret: "minio-credentials"
-    drivesPerNode: 1
-    replicas: 3
-    pools: 1
 
+    mode: standalone ## other supported values are "distributed" for resiliency
+    drivesPerNode: 1
+    replicas: 1 # standalone
+    pools: 1
+      
     users:
       - accessKey: plainaccesskey
         secretKey: plainsecretkey # TODO: update this once grafana enterprise boys start supporting secrets in their charts
