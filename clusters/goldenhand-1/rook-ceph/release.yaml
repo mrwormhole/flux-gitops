@@ -32,9 +32,9 @@ spec:
       enableRbdDriver: true
       enableCephfsDriver: true
       enableCSIHostNetwork: true
-      enableCephfsSnapshotter: true
-      enableNFSSnapshotter: true
-      enableRBDSnapshotter: true
+      enableCephfsSnapshotter: false
+      enableNFSSnapshotter: false
+      enableRBDSnapshotter: false
       enablePluginSelinuxHostMount: false
       enableCSIEncryption: false
       provisionerReplicas: 2
@@ -94,3 +94,293 @@ spec:
 
     monitoring:
       enabled: false
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  interval: 96h
+  chart:
+    spec:
+      chart: rook-ceph-cluster
+      version: "1.13.1"
+      sourceRef:
+        kind: HelmRepository
+        name: rook-release
+        namespace: flux-system
+      interval: 24h
+  values:
+    operatorNamespace: rook-ceph
+
+    toolbox:
+      enabled: false
+
+    monitoring:
+      enabled: false
+      createPrometheusRules: false
+      # -- The namespace in which to create the prometheus rules, if different from the rook cluster namespace.
+      # If you have multiple rook-ceph clusters in the same k8s cluster, choose the same namespace (ideally, namespace with prometheus
+      # deployed) to set rulesNamespaceOverride for all the clusters. Otherwise, you will get duplicate alerts with multiple alert definitions.
+      rulesNamespaceOverride:
+      # interval: 5s
+      prometheusRule:
+        labels: {}
+        annotations: {}
+
+    cephClusterSpec:
+      cephVersion:
+        image: quay.io/ceph/ceph:v18.2.1-20240103
+        allowUnsupported: false
+
+      dataDirHostPath: /var/lib/rook
+      skipUpgradeChecks: false
+      continueUpgradeAfterChecksEvenIfNotHealthy: false
+      waitTimeoutForHealthyOSDInMinutes: 10
+
+      mon:
+        count: 3
+        allowMultiplePerNode: false
+
+      mgr:
+        count: 2
+        allowMultiplePerNode: false
+        modules:
+          - name: pg_autoscaler
+            enabled: true
+
+      dashboard:
+        enabled: true
+        port: 8443
+        ssl: false
+
+      crashCollector:
+        disable: false
+        daysToRetain: 30
+
+      logCollector:
+        enabled: true
+        periodicity: daily # one of: hourly, daily, weekly, monthly
+        maxLogSize: 500M # SUFFIX may be 'M' or 'G'. Must be at least 1M.
+
+      cleanupPolicy:
+        confirmation: "yes-really-destroy-data"
+        sanitizeDisks:
+          method: quick
+          dataSource: zero
+          iteration: 1
+        allowUninstallWithVolumes: false
+
+      resources:
+        mgr:
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+        mon:
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+          requests:
+            cpu: "1000m"
+            memory: "1Gi"
+        osd:
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+          requests:
+            cpu: "1000m"
+            memory: "4Gi"
+        prepareosd:
+          requests:
+            cpu: "500m"
+            memory: "50Mi"
+        mgr-sidecar:
+          limits:
+            cpu: "500m"
+            memory: "100Mi"
+          requests:
+            cpu: "100m"
+            memory: "40Mi"
+        crashcollector:
+          limits:
+            cpu: "500m"
+            memory: "60Mi"
+          requests:
+            cpu: "100m"
+            memory: "60Mi"
+        logcollector:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "100Mi"
+        cleanup:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "100Mi"
+        exporter:
+          limits:
+            cpu: "250m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "50Mi"
+
+      removeOSDsIfOutAndSafeToRemove: false
+
+      storage:
+        useAllNodes: true
+        useAllDevices: true
+
+      disruptionManagement:
+        managePodBudgets: true
+        osdMaintenanceTimeout: 30
+        pgHealthCheckTimeout: 0
+
+      healthCheck:
+        daemonHealth:
+          mon:
+            disabled: false
+            interval: 45s
+          osd:
+            disabled: false
+            interval: 60s
+          status:
+            disabled: false
+            interval: 60s
+        livenessProbe:
+          mon:
+            disabled: false
+          mgr:
+            disabled: false
+          osd:
+            disabled: false
+
+    cephBlockPools:
+      - name: ceph-blockpool
+        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Block-Storage/ceph-block-pool-crd.md#spec for available configuration
+        spec:
+          failureDomain: host
+          replicated:
+            size: 3
+          # Enables collecting RBD per-image IO statistics by enabling dynamic OSD performance counters. Defaults to false.
+          # For reference: https://docs.ceph.com/docs/master/mgr/prometheus/#rbd-io-statistics
+          # enableRBDStats: true
+        storageClass:
+          enabled: true
+          name: ceph-block
+          isDefault: true
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: "Immediate"
+          mountOptions: []
+          allowedTopologies: []
+          parameters:
+            # RBD image format. Defaults to "2".
+            imageFormat: "2"
+
+            # RBD image features, equivalent to OR'd bitfield value: 63
+            # Available for imageFormat: "2". Older releases of CSI RBD
+            # support only the `layering` feature. The Linux kernel (KRBD) supports the
+            # full feature complement as of 5.4
+            imageFeatures: layering
+
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+            csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/fstype: ext4
+
+    cephFileSystems:
+      - name: ceph-filesystem
+        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#filesystem-settings for available configuration
+        spec:
+          metadataPool:
+            replicated:
+              size: 3
+          dataPools:
+            - failureDomain: host
+              replicated:
+                size: 3
+              name: data0
+          metadataServer:
+            activeCount: 1
+            activeStandby: true
+            resources:
+              limits:
+                cpu: "2000m"
+                memory: "4Gi"
+              requests:
+                cpu: "1000m"
+                memory: "4Gi"
+            priorityClassName: system-cluster-critical
+        storageClass:
+          enabled: true
+          isDefault: false
+          name: ceph-filesystem
+          pool: data0
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: "Immediate"
+          mountOptions: []
+          # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Shared-Filesystem-CephFS/filesystem-storage.md#provision-storage for available configuration
+          parameters:
+            csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/provisioner-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+            csi.storage.k8s.io/controller-expand-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+            csi.storage.k8s.io/node-stage-secret-namespace: "{{ .Release.Namespace }}"
+            csi.storage.k8s.io/fstype: ext4
+
+    cephFileSystemVolumeSnapshotClass:
+      enabled: false
+
+    cephBlockPoolsVolumeSnapshotClass:
+      enabled: false
+
+    cephObjectStores:
+      - name: ceph-objectstore
+        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Object-Storage/ceph-object-store-crd.md#object-store-settings for available configuration
+        spec:
+          metadataPool:
+            failureDomain: host
+            replicated:
+              size: 3
+          dataPool:
+            failureDomain: host
+            erasureCoded:
+              dataChunks: 2
+              codingChunks: 1
+          preservePoolsOnDelete: true
+          gateway:
+            port: 80
+            resources:
+              limits:
+                cpu: "2000m"
+                memory: "2Gi"
+              requests:
+                cpu: "1000m"
+                memory: "1Gi"
+            instances: 1
+            priorityClassName: system-cluster-critical
+        storageClass:
+          enabled: true
+          name: ceph-bucket
+          reclaimPolicy: Delete
+          volumeBindingMode: "Immediate"
+          # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Object-Storage-RGW/ceph-object-bucket-claim.md#storageclass for available configuration
+          parameters:
+            region: eu-central-1
+        ingress:
+          enabled: false
