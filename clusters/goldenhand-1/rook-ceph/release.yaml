@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: rook-ceph
@@ -51,27 +51,27 @@ spec:
 
       cephcsi:
         # @default -- `quay.io/cephcsi/cephcsi:v3.10.1`
-        image:
+        image: quay.io/cephcsi/cephcsi:v3.10.1
 
       registrar:
         # @default -- `registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.1`
-        image:
+        image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.1
 
       provisioner:
         # @default -- `registry.k8s.io/sig-storage/csi-provisioner:v3.6.2`
-        image:
+        image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.2
 
       snapshotter:
         # @default -- `registry.k8s.io/sig-storage/csi-snapshotter:v6.3.2`
-        image:
+        image: registry.k8s.io/sig-storage/csi-snapshotter:v6.3.2
 
       attacher:
         # @default -- `registry.k8s.io/sig-storage/csi-attacher:v4.4.2`
-        image:
+        image: registry.k8s.io/sig-storage/csi-attacher:v4.4.2
 
       resizer:
         # @default -- `registry.k8s.io/sig-storage/csi-resizer:v1.9.2`
-        image:
+        image: registry.k8s.io/sig-storage/csi-resizer:v1.9.2
 
       csiAddons:
         enabled: false
@@ -95,7 +95,7 @@ spec:
     monitoring:
       enabled: false
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: rook-ceph-cluster
