@@ -29,21 +29,13 @@ spec:
       # to restore them.
       enabled: true
 
-    resources:
-      limits:
-        cpu: 500m
-        memory: 512Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-
     csi:
       enableRbdDriver: true
       enableCephfsDriver: true
       enableCSIHostNetwork: true
-      enableCephfsSnapshotter: false #?
-      enableNFSSnapshotter: false #?
-      enableRBDSnapshotter: false #?
+      enableCephfsSnapshotter: true #?
+      enableNFSSnapshotter: true #?
+      enableRBDSnapshotter: true #?
       enablePluginSelinuxHostMount: false
       enableCSIEncryption: false
       provisionerReplicas: 2
