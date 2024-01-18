@@ -15,4 +15,4 @@ spec:
         namespace: flux-system
       interval: 24h
   values:
-    scaleDownOperator: true
+    scaleDownOperator: false
