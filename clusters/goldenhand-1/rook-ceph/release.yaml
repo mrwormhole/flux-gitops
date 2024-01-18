@@ -19,55 +19,9 @@ spec:
       repository: rook/ceph
       tag: v1.13.2
       pullPolicy: IfNotPresent
-    
-    crds:
-      # -- Whether the helm chart should create and update the CRDs. If false, the CRDs must be
-      # managed independently with deploy/examples/crds.yaml.
-      # **WARNING** Only set during first deployment. If later disabled the cluster may be DESTROYED.
-      # If the CRDs are deleted in this case, see
-      # [the disaster recovery guide](https://rook.io/docs/rook/latest/Troubleshooting/disaster-recovery/#restoring-crds-after-deletion)
-      # to restore them.
-      enabled: true
-
-    csi:
-      enableRbdDriver: true
-      enableCephfsDriver: true
-      enableCSIHostNetwork: true
-      enableCephfsSnapshotter: true #?
-      enableNFSSnapshotter: true #?
-      enableRBDSnapshotter: true #?
-      enablePluginSelinuxHostMount: false
-      enableCSIEncryption: false
-      provisionerReplicas: 2
-
-      serviceMonitor:
-        # -- Enable ServiceMonitor for Ceph CSI drivers
-        enabled: false
-        # -- Service monitor scrape interval
-        interval: 5s
-        # -- ServiceMonitor additional labels
-        labels: {}
-        # -- Use a different namespace for the ServiceMonitor
-        namespace:
-
-      csiAddons:
-        enabled: false
-
-      nfs:
-        # disabled because NFS is experimental
-        # https://rook.io/docs/rook/v1.12/Storage-Configuration/Ceph-CSI/ceph-csi-drivers/
-        enabled: false
-
-      topology:
-        enabled: false
-
-      cephFSAttachRequired: true
-      rbdAttachRequired: true
-      nfsAttachRequired: true
 
     scaleDownOperator: true
-    hostpathRequiresPrivileged: false
-    enableOBCWatchOperatorNamespace: true
-
     monitoring:
       enabled: false
+    crds:
+      enabled: true
