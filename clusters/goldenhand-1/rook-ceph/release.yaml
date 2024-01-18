@@ -22,11 +22,11 @@ spec:
     
     resources:
       limits:
-        cpu: 2000m
-        memory: 2048Mi
+        cpu: 500m
+        memory: 512Mi
       requests:
-        cpu: 2000m
-        memory: 2048Mi
+        cpu: 100m
+        memory: 128Mi
 
     crds:
       # -- Whether the helm chart should create and update the CRDs. If false, the CRDs must be
