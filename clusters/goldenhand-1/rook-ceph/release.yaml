@@ -1,235 +1,235 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
-kind: HelmRelease
-metadata:
-  name: rook-ceph
-  namespace: rook-ceph
-spec:
-  interval: 96h
-  chart:
-    spec:
-      chart: rook-ceph
-      version: "v1.13.2"
-      sourceRef:
-        kind: HelmRepository
-        name: rook-release
-        namespace: flux-system
-      interval: 24h
-  values:
-    image:
-      repository: rook/ceph
-      tag: v1.13.2
-      pullPolicy: IfNotPresent
+# apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# kind: HelmRelease
+# metadata:
+#   name: rook-ceph
+#   namespace: rook-ceph
+# spec:
+#   interval: 96h
+#   chart:
+#     spec:
+#       chart: rook-ceph
+#       version: "v1.13.2"
+#       sourceRef:
+#         kind: HelmRepository
+#         name: rook-release
+#         namespace: flux-system
+#       interval: 24h
+#   values:
+#     image:
+#       repository: rook/ceph
+#       tag: v1.13.2
+#       pullPolicy: IfNotPresent
     
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 1024Mi
-      requests:
-        cpu: 1000m
-        memory: 1024Mi
+#     resources:
+#       limits:
+#         cpu: 1000m
+#         memory: 1024Mi
+#       requests:
+#         cpu: 1000m
+#         memory: 1024Mi
 
-    crds:
-      # -- Whether the helm chart should create and update the CRDs. If false, the CRDs must be
-      # managed independently with deploy/examples/crds.yaml.
-      # **WARNING** Only set during first deployment. If later disabled the cluster may be DESTROYED.
-      # If the CRDs are deleted in this case, see
-      # [the disaster recovery guide](https://rook.io/docs/rook/latest/Troubleshooting/disaster-recovery/#restoring-crds-after-deletion)
-      # to restore them.
-      enabled: true
+#     crds:
+#       # -- Whether the helm chart should create and update the CRDs. If false, the CRDs must be
+#       # managed independently with deploy/examples/crds.yaml.
+#       # **WARNING** Only set during first deployment. If later disabled the cluster may be DESTROYED.
+#       # If the CRDs are deleted in this case, see
+#       # [the disaster recovery guide](https://rook.io/docs/rook/latest/Troubleshooting/disaster-recovery/#restoring-crds-after-deletion)
+#       # to restore them.
+#       enabled: true
 
-    csi:
-      enableRbdDriver: true
-      enableCephfsDriver: true
-      enableCSIHostNetwork: true
-      enableCephfsSnapshotter: false
-      enableNFSSnapshotter: false
-      enableRBDSnapshotter: false
-      enablePluginSelinuxHostMount: false
-      enableCSIEncryption: false
-      provisionerReplicas: 2
+#     csi:
+#       enableRbdDriver: true
+#       enableCephfsDriver: true
+#       enableCSIHostNetwork: true
+#       enableCephfsSnapshotter: false
+#       enableNFSSnapshotter: false
+#       enableRBDSnapshotter: false
+#       enablePluginSelinuxHostMount: false
+#       enableCSIEncryption: false
+#       provisionerReplicas: 2
 
-      serviceMonitor:
-        # -- Enable ServiceMonitor for Ceph CSI drivers
-        enabled: false
-        # -- Service monitor scrape interval
-        interval: 5s
-        # -- ServiceMonitor additional labels
-        labels: {}
-        # -- Use a different namespace for the ServiceMonitor
-        namespace:
+#       serviceMonitor:
+#         # -- Enable ServiceMonitor for Ceph CSI drivers
+#         enabled: false
+#         # -- Service monitor scrape interval
+#         interval: 5s
+#         # -- ServiceMonitor additional labels
+#         labels: {}
+#         # -- Use a different namespace for the ServiceMonitor
+#         namespace:
 
-      csiAddons:
-        enabled: false
+#       csiAddons:
+#         enabled: false
 
-      nfs:
-        # disabled because NFS is experimental
-        # https://rook.io/docs/rook/v1.12/Storage-Configuration/Ceph-CSI/ceph-csi-drivers/
-        enabled: false
+#       nfs:
+#         # disabled because NFS is experimental
+#         # https://rook.io/docs/rook/v1.12/Storage-Configuration/Ceph-CSI/ceph-csi-drivers/
+#         enabled: false
 
-      topology:
-        enabled: false
+#       topology:
+#         enabled: false
 
-      cephFSAttachRequired: true
-      rbdAttachRequired: true
-      nfsAttachRequired: true
+#       cephFSAttachRequired: true
+#       rbdAttachRequired: true
+#       nfsAttachRequired: true
 
-    scaleDownOperator: false # when it is true, it ruins my life
-    hostpathRequiresPrivileged: false
-    enableOBCWatchOperatorNamespace: true
+#     scaleDownOperator: false # when it is true, it ruins my life
+#     hostpathRequiresPrivileged: false
+#     enableOBCWatchOperatorNamespace: true
 
-    monitoring:
-      enabled: false
----
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
-kind: HelmRelease
-metadata:
-  name: rook-ceph-cluster
-  namespace: rook-ceph
-spec:
-  interval: 96h
-  chart:
-    spec:
-      chart: rook-ceph-cluster
-      version: "v1.13.2"
-      sourceRef:
-        kind: HelmRepository
-        name: rook-release
-        namespace: flux-system
-      interval: 24h
-  values:
-    operatorNamespace: rook-ceph
+#     monitoring:
+#       enabled: false
+# ---
+# apiVersion: helm.toolkit.fluxcd.io/v2beta2
+# kind: HelmRelease
+# metadata:
+#   name: rook-ceph-cluster
+#   namespace: rook-ceph
+# spec:
+#   interval: 96h
+#   chart:
+#     spec:
+#       chart: rook-ceph-cluster
+#       version: "v1.13.2"
+#       sourceRef:
+#         kind: HelmRepository
+#         name: rook-release
+#         namespace: flux-system
+#       interval: 24h
+#   values:
+#     operatorNamespace: rook-ceph
 
-    toolbox:
-      enabled: false
+#     toolbox:
+#       enabled: false
 
-    monitoring:
-      enabled: false
+#     monitoring:
+#       enabled: false
 
-    cephClusterSpec:
-      cephVersion:
-        image: quay.io/ceph/ceph:v18.2.1
-        allowUnsupported: false
-      dataDirHostPath: /var/lib/rook
-      skipUpgradeChecks: false
-      continueUpgradeAfterChecksEvenIfNotHealthy: false
-      waitTimeoutForHealthyOSDInMinutes: 10
+#     cephClusterSpec:
+#       cephVersion:
+#         image: quay.io/ceph/ceph:v18.2.1
+#         allowUnsupported: false
+#       dataDirHostPath: /var/lib/rook
+#       skipUpgradeChecks: false
+#       continueUpgradeAfterChecksEvenIfNotHealthy: false
+#       waitTimeoutForHealthyOSDInMinutes: 10
 
-      mon:
-        count: 3
-        allowMultiplePerNode: false
-      mgr:
-        count: 2
-        allowMultiplePerNode: false
-        modules:
-          - name: pg_autoscaler
-            enabled: true
+#       mon:
+#         count: 3
+#         allowMultiplePerNode: false
+#       mgr:
+#         count: 2
+#         allowMultiplePerNode: false
+#         modules:
+#           - name: pg_autoscaler
+#             enabled: true
 
-      dashboard:
-        enabled: true
-        port: 8443
-        ssl: true
+#       dashboard:
+#         enabled: true
+#         port: 8443
+#         ssl: true
 
-      crashCollector:
-        disable: false
-        daysToRetain: 30
+#       crashCollector:
+#         disable: false
+#         daysToRetain: 30
 
-      logCollector:
-        enabled: true
-        periodicity: daily # one of: hourly, daily, weekly, monthly
-        maxLogSize: 500M # SUFFIX may be 'M' or 'G'. Must be at least 1M.
+#       logCollector:
+#         enabled: true
+#         periodicity: daily # one of: hourly, daily, weekly, monthly
+#         maxLogSize: 500M # SUFFIX may be 'M' or 'G'. Must be at least 1M.
 
-      # cleanupPolicy:
-      #   confirmation: "yes-really-destroy-data"
-      #   sanitizeDisks:
-      #     method: quick
-      #     dataSource: zero
-      #     iteration: 1
-      #   allowUninstallWithVolumes: false
+#       # cleanupPolicy:
+#       #   confirmation: "yes-really-destroy-data"
+#       #   sanitizeDisks:
+#       #     method: quick
+#       #     dataSource: zero
+#       #     iteration: 1
+#       #   allowUninstallWithVolumes: false
 
-      removeOSDsIfOutAndSafeToRemove: false
+#       removeOSDsIfOutAndSafeToRemove: false
 
-      storage:
-        useAllNodes: true
-        useAllDevices: true
+#       storage:
+#         useAllNodes: true
+#         useAllDevices: true
 
-    cephBlockPools:
-      - name: ceph-blockpool
-        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Block-Storage/ceph-block-pool-crd.md#spec for available configuration
-        spec:
-          failureDomain: host
-          replicated:
-            size: 3
-          # Enables collecting RBD per-image IO statistics by enabling dynamic OSD performance counters. Defaults to false.
-          # For reference: https://docs.ceph.com/docs/master/mgr/prometheus/#rbd-io-statistics
-          # enableRBDStats: true
-        storageClass:
-          enabled: true
-          name: ceph-block
-          isDefault: true
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          volumeBindingMode: "Immediate"
-          parameters:
-            csi.storage.k8s.io/fstype: ext4
+#     cephBlockPools:
+#       - name: ceph-blockpool
+#         # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Block-Storage/ceph-block-pool-crd.md#spec for available configuration
+#         spec:
+#           failureDomain: host
+#           replicated:
+#             size: 3
+#           # Enables collecting RBD per-image IO statistics by enabling dynamic OSD performance counters. Defaults to false.
+#           # For reference: https://docs.ceph.com/docs/master/mgr/prometheus/#rbd-io-statistics
+#           # enableRBDStats: true
+#         storageClass:
+#           enabled: true
+#           name: ceph-block
+#           isDefault: true
+#           reclaimPolicy: Delete
+#           allowVolumeExpansion: true
+#           volumeBindingMode: "Immediate"
+#           parameters:
+#             csi.storage.k8s.io/fstype: ext4
 
-    cephFileSystems:
-      - name: ceph-filesystem
-        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#filesystem-settings for available configuration
-        spec:
-          metadataPool:
-            replicated:
-              size: 3
-          dataPools:
-            - failureDomain: host
-              replicated:
-                size: 3
-              name: data0
-          metadataServer:
-            activeCount: 1
-            activeStandby: true
-            priorityClassName: system-cluster-critical
-        storageClass:
-          enabled: true
-          isDefault: false
-          name: ceph-filesystem
-          pool: data0
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          volumeBindingMode: "Immediate"
-          parameters:
-            csi.storage.k8s.io/fstype: ext4
+#     cephFileSystems:
+#       - name: ceph-filesystem
+#         # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Shared-Filesystem/ceph-filesystem-crd.md#filesystem-settings for available configuration
+#         spec:
+#           metadataPool:
+#             replicated:
+#               size: 3
+#           dataPools:
+#             - failureDomain: host
+#               replicated:
+#                 size: 3
+#               name: data0
+#           metadataServer:
+#             activeCount: 1
+#             activeStandby: true
+#             priorityClassName: system-cluster-critical
+#         storageClass:
+#           enabled: true
+#           isDefault: false
+#           name: ceph-filesystem
+#           pool: data0
+#           reclaimPolicy: Delete
+#           allowVolumeExpansion: true
+#           volumeBindingMode: "Immediate"
+#           parameters:
+#             csi.storage.k8s.io/fstype: ext4
 
-    cephFileSystemVolumeSnapshotClass:
-      enabled: false
+#     cephFileSystemVolumeSnapshotClass:
+#       enabled: false
 
-    cephBlockPoolsVolumeSnapshotClass:
-      enabled: false
+#     cephBlockPoolsVolumeSnapshotClass:
+#       enabled: false
 
-    cephObjectStores:
-      - name: ceph-objectstore
-        # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Object-Storage/ceph-object-store-crd.md#object-store-settings for available configuration
-        spec:
-          metadataPool:
-            failureDomain: host
-            replicated:
-              size: 3
-          dataPool:
-            failureDomain: host
-            erasureCoded:
-              dataChunks: 2
-              codingChunks: 1
-          preservePoolsOnDelete: true
-          gateway:
-            port: 80
-            instances: 1
-            priorityClassName: system-cluster-critical
-        storageClass:
-          enabled: true
-          name: ceph-bucket
-          reclaimPolicy: Delete
-          volumeBindingMode: "Immediate"
-          # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Object-Storage-RGW/ceph-object-bucket-claim.md#storageclass for available configuration
-          parameters:
-            region: eu-central-1
-        ingress:
-          enabled: false
+#     cephObjectStores:
+#       - name: ceph-objectstore
+#         # see https://github.com/rook/rook/blob/master/Documentation/CRDs/Object-Storage/ceph-object-store-crd.md#object-store-settings for available configuration
+#         spec:
+#           metadataPool:
+#             failureDomain: host
+#             replicated:
+#               size: 3
+#           dataPool:
+#             failureDomain: host
+#             erasureCoded:
+#               dataChunks: 2
+#               codingChunks: 1
+#           preservePoolsOnDelete: true
+#           gateway:
+#             port: 80
+#             instances: 1
+#             priorityClassName: system-cluster-critical
+#         storageClass:
+#           enabled: true
+#           name: ceph-bucket
+#           reclaimPolicy: Delete
+#           volumeBindingMode: "Immediate"
+#           # see https://github.com/rook/rook/blob/master/Documentation/Storage-Configuration/Object-Storage-RGW/ceph-object-bucket-claim.md#storageclass for available configuration
+#           parameters:
+#             region: eu-central-1
+#         ingress:
+#           enabled: false
