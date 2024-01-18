@@ -33,9 +33,9 @@ spec:
       enableRbdDriver: true
       enableCephfsDriver: true
       enableCSIHostNetwork: true
-      enableCephfsSnapshotter: false #?
-      enableNFSSnapshotter: false #?
-      enableRBDSnapshotter: false #?
+      enableCephfsSnapshotter: false
+      enableNFSSnapshotter: false
+      enableRBDSnapshotter: false
       enablePluginSelinuxHostMount: false
       enableCSIEncryption: false
       provisionerReplicas: 2
@@ -119,7 +119,7 @@ spec:
       dashboard:
         enabled: true
         port: 8443
-        ssl: false
+        ssl: true
 
       crashCollector:
         disable: false
