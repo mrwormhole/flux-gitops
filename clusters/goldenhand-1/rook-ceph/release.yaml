@@ -19,6 +19,14 @@ spec:
       repository: rook/ceph
       tag: v1.13.2
       pullPolicy: IfNotPresent
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1024Mi
+      requests:
+        cpu: 1000m
+        memory: 1024Mi
 
     crds:
       # -- Whether the helm chart should create and update the CRDs. If false, the CRDs must be
