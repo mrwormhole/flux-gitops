@@ -130,13 +130,13 @@ spec:
         periodicity: daily # one of: hourly, daily, weekly, monthly
         maxLogSize: 500M # SUFFIX may be 'M' or 'G'. Must be at least 1M.
 
-      cleanupPolicy:
-        confirmation: "yes-really-destroy-data"
-        sanitizeDisks:
-          method: quick
-          dataSource: zero
-          iteration: 1
-        allowUninstallWithVolumes: false
+      # cleanupPolicy:
+      #   confirmation: "yes-really-destroy-data"
+      #   sanitizeDisks:
+      #     method: quick
+      #     dataSource: zero
+      #     iteration: 1
+      #   allowUninstallWithVolumes: false
 
       removeOSDsIfOutAndSafeToRemove: false
 
