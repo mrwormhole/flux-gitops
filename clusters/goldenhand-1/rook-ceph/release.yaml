@@ -15,13 +15,4 @@ spec:
         namespace: flux-system
       interval: 24h
   values:
-    image:
-      repository: rook/ceph
-      tag: v1.13.2
-      pullPolicy: IfNotPresent
-
     scaleDownOperator: true
-    monitoring:
-      enabled: false
-    crds:
-      enabled: true
